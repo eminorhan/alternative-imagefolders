@@ -29,7 +29,7 @@ def is_image_file(filename):
     return has_file_allowed_extension(filename, IMG_EXTENSIONS)
 
 
-def make_dataset(dir, class_to_idx, extensions):
+def make_dataset(dir, class_to_idx, extensions, retained_fraction):
     images = []
     dir = os.path.expanduser(dir)
     idx = 0
@@ -39,7 +39,9 @@ def make_dataset(dir, class_to_idx, extensions):
             continue
 
         for root, _, fnames in sorted(os.walk(d)):
-            for fname in sorted(fnames):
+            sorted_fnames = sorted(fnames)
+            num_retained = int(len(sorted_fnames) * retained_fraction)
+            for fname in sorted_fnames[:num_retained]:
                 if has_file_allowed_extension(fname, extensions):
                     path = os.path.join(root, fname)
                     item = (path, idx)
@@ -73,9 +75,9 @@ class IndexedDatasetFolder(data.Dataset):
         targets (list): The class_index value for each image in the dataset
     """
 
-    def __init__(self, root, loader, extensions, transform=None, target_transform=None):
+    def __init__(self, root, loader, extensions, transform=None, target_transform=None, retained_fraction=1.0):
         classes, class_to_idx = self._find_classes(root)
-        samples = make_dataset(root, class_to_idx, extensions)
+        samples = make_dataset(root, class_to_idx, extensions, retained_fraction)
         if len(samples) == 0:
             raise(RuntimeError("Found 0 files in subfolders of: " + root + "\n"
                                "Supported extensions are: " + ",".join(extensions)))
@@ -91,6 +93,7 @@ class IndexedDatasetFolder(data.Dataset):
 
         self.transform = transform
         self.target_transform = target_transform
+        self.retained_fraction = retained_fraction
 
     def _find_classes(self, dir):
         """
@@ -188,9 +191,10 @@ class IndexedImageFolder(IndexedDatasetFolder):
         class_to_idx (dict): Dict with items (class_name, class_index).
         imgs (list): List of (image path, class_index) tuples
     """
-    def __init__(self, root, transform=None, target_transform=None,
+    def __init__(self, root, retained_fraction, transform=None, target_transform=None,
                  loader=default_loader):
         super(IndexedImageFolder, self).__init__(root, loader, IMG_EXTENSIONS,
-                                          transform=transform,
-                                          target_transform=target_transform)
+                                                 transform=transform,
+                                                 target_transform=target_transform,
+                                                 retained_fraction=retained_fraction)
         self.imgs = self.samples
