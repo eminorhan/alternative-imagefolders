@@ -1,8 +1,8 @@
 ## Alternative `ImageFolder`s 
 
-`IndexedImageFolder` is an alternative version of `ImageFolder` that returns the image index instead of the class index. This is useful in instance-based problems where the images need to have individual indices as opposed to a single class index.
+`IndexedImageFolder` (`iif`) is an alternative version of `ImageFolder` that returns the image index instead of the class index. This is useful in instance-based problems where the images need to have individual indices as opposed to a single class index.
 
-`MultirootImageFolder` is an alternative version of `ImageFolder` that takes in multiple data directories as input (provided as a list).
+`MultirootImageFolder` (`mif`) is an alternative version of `ImageFolder` that takes in multiple data directories as input (provided as a list).
 
 Please see [`test_iif.py`](https://github.com/eminorhan/alternative-imagefolders/blob/master/test_iif.py) and [`test_mif.py`](https://github.com/eminorhan/alternative-imagefolders/blob/master/test_mif.py) for usage examples.
 
