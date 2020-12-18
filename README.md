@@ -8,4 +8,6 @@ See [`test_iif.py`](https://github.com/eminorhan/alternative-imagefolders/blob/m
 
 Both of these classes are drop-in replacements for `torchvision.datasets.ImageFolder`, hence can be used in the same way. 
 
-[comment]: <> (The code in this repo is a simple modification of an [earlier version](https://github.com/pytorch/vision/blob/d6c7900d06c3388bf814cecbe90f91a9afecbefb/torchvision/datasets/folder.py) of `ImageFolder`.)
+<!--- 
+The code in this repo is a simple modification of an [earlier version](https://github.com/pytorch/vision/blob/d6c7900d06c3388bf814cecbe90f91a9afecbefb/torchvision/datasets/folder.py) of `ImageFolder`.
+-->
