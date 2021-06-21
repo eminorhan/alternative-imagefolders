@@ -69,6 +69,7 @@ class MultirootDatasetFolder(data.Dataset):
     Args:
         roots (list): Root directories to traverse.
         loader (callable): A function to load a sample given its path.
+        fraction (float): Fraction of classes to retain.
         extensions (tuple[string]): A list of allowed extensions.
             both extensions and is_valid_file should not be passed.
         transform (callable, optional): A function/transform that takes in
@@ -87,11 +88,11 @@ class MultirootDatasetFolder(data.Dataset):
         targets (list): The class_index value for each image in the dataset
     """
 
-    def __init__(self, roots, loader, extensions=None, transform=None, target_transform=None, is_valid_file=None):
+    def __init__(self, roots, loader, fraction=1.0, extensions=None, transform=None, target_transform=None, is_valid_file=None):
         if isinstance(roots, str):
             roots = [roots]
 
-        classes, class_to_idx = self._find_classes(roots)
+        classes, class_to_idx = self._find_classes(roots, fraction)
         samples = make_dataset(class_to_idx, extensions, is_valid_file)
         if len(samples) == 0:
             raise (RuntimeError("Found 0 files in subfolders of: " + str(roots)[1:-1] + "\n"
@@ -108,12 +109,13 @@ class MultirootDatasetFolder(data.Dataset):
         self.transform = transform
         self.target_transform = target_transform
 
-    def _find_classes(self, dirs):
+    def _find_classes(self, dirs, fraction):
         """
         Finds the class folders in a dataset.
 
         Args:
             dirs (list): Root directories.
+            fraction (float): Fraction of classes to retain.
 
         Returns:
             tuple: (classes, class_to_idx) where classes are relative to (dir), and class_to_idx is a dictionary.
@@ -126,6 +128,8 @@ class MultirootDatasetFolder(data.Dataset):
             classes = classes + [os.path.join(dir, d.name) for d in os.scandir(dir) if d.is_dir()]
 
         classes.sort()
+        num_classes = round(len(classes) * fraction)
+        classes = classes[:num_classes]
         class_to_idx = {classes[i]: i for i in range(len(classes))}
         return classes, class_to_idx
 
@@ -192,6 +196,7 @@ class MultirootImageFolder(MultirootDatasetFolder):
 
     Args:
         roots (list): Root directories.
+        fraction (float): Fraction of classes to retain.
         transform (callable, optional): A function/transform that  takes in an PIL image
             and returns a transformed version. E.g, ``transforms.RandomCrop``
         target_transform (callable, optional): A function/transform that takes in the
@@ -206,9 +211,9 @@ class MultirootImageFolder(MultirootDatasetFolder):
         imgs (list): List of (image path, class_index) tuples
     """
 
-    def __init__(self, roots, transform=None, target_transform=None,
+    def __init__(self, roots, fraction, transform=None, target_transform=None,
                  loader=default_loader, is_valid_file=None):
-        super(MultirootImageFolder, self).__init__(roots, loader, IMG_EXTENSIONS if is_valid_file is None else None, 
+        super(MultirootImageFolder, self).__init__(roots, loader, fraction, IMG_EXTENSIONS if is_valid_file is None else None, 
                                             transform=transform,
                                             target_transform=target_transform,
                                             is_valid_file=is_valid_file)
